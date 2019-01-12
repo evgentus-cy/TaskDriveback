@@ -11,7 +11,7 @@ let views = {internal: 0, external: 0};
 // Check visit type
 const isLocalIp = (ip) => {
   const firstOctet = ip.split('.')[0];
-  return !!( firstOctet === '10' || firstOctet === '192' )
+  return !!(firstOctet === '10' || firstOctet === '192')
 };
 
 // Reset pageviews
