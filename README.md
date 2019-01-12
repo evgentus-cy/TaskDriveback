@@ -24,7 +24,7 @@ gcloud config set project <project_name>
 ``
 
 ``
-gcloud container clusters create <clustername> --zone us-central1-b --enable-autorepair --num-nodes 2 --enable-autoscaling --min-nodes 2 --max-nodes 4
+gcloud container clusters create <cluster_name> --zone us-central1-b --enable-autorepair --num-nodes 2 --enable-autoscaling --min-nodes 2 --max-nodes 4
 ``
 
 ``
