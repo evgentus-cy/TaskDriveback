@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: test-task-counter
+spec:
+  selector:
+    app: test-task-counter
+  type: NodePort
+  ports:
+  - protocol: TCP
+    nodePort: 32131
+    port: 80
+    targetPort: 3000
