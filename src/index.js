@@ -1,12 +1,11 @@
 import express from 'express'
-
-const app = express();
+import redis from './utils/redis'
 
 // Initial settings
-const interval = 60*1000; // One minute
+const interval = 60; // One minute
 const port = process.env.PORT || 3000;
 
-let views = {internal: 0, external: 0};
+const app = express();
 
 // Check visit type
 const isLocalIp = (ip) => {
@@ -14,18 +13,35 @@ const isLocalIp = (ip) => {
   return !!(firstOctet === '10' || firstOctet === '192')
 };
 
-// Reset pageviews
-setInterval(() => {
-  views = {internal: 0, external: 0};
-}, interval);
+// Incr PageViews
+const incrView = async () => {
+  try {
+    const viewsCount = await redis.incrAsync('views');
+    if (viewsCount === 1) {
+      await redis.expireAsync('views', interval);
+    }
+    return viewsCount;
+  } catch ({message}) {
+    console.error(message)
+  }
+};
 
 // Test endpoint
-app.get('/', (req, res) => {
-  let {hostname} = req;
+app.get('/', async (req, res) => {
+  try {
+    let {hostname} = req;
 
-  isLocalIp(hostname) ? views.internal++ : views.external++ ;
+    const views = !isLocalIp(hostname) ? await incrView() : 0;
 
-  res.json(views);
+    return res.json({views});
+  } catch ({message}) {
+    return res.status(400).json({error: 1, message})
+  }
+});
+
+// Route not found
+app.use((req, res) => {
+  return res.status(404).json({error: true, message: 'Route not found'})
 });
 
 // Start server
